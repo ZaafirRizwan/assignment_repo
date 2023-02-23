@@ -21,14 +21,12 @@ from utils_data import (
     ScienceQADatasetStd,
     ScienceQADatasetImg,
 )
-from utils_prompt import *
 from utils_evaluate import get_scores
 from rich.table import Column, Table
 from rich import box
 from rich.console import Console
 
 console = Console(record=True)
-from torch import cuda
 import nltk
 import evaluate
 
