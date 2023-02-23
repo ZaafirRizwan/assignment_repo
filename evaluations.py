@@ -1,17 +1,18 @@
-'''
+"""
 Adapted from https://github.com/lupantech/ScienceQA
-'''
+"""
 
 import re
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu
 from sentence_transformers import util
 
+
 ########################
 ## BLEU
 ########################
 def tokenize(text):
-    tokens = re.split(r'\s|\.', text)
+    tokens = re.split(r"\s|\.", text)
     tokens = [t for t in tokens if len(t) > 0]
     return tokens
 
@@ -21,13 +22,21 @@ def bleu_score(reference, hypothesis, gram):
     hypothesis_tokens = tokenize(hypothesis)
 
     if gram == 1:
-        bleu = sentence_bleu([reference_tokens], hypothesis_tokens, (1., ))  # BELU-1
+        bleu = sentence_bleu([reference_tokens], hypothesis_tokens, (1.0,))  # BELU-1
     elif gram == 2:
-        bleu = sentence_bleu([reference_tokens], hypothesis_tokens, (1. / 2., 1. / 2.))  # BELU-2
+        bleu = sentence_bleu(
+            [reference_tokens], hypothesis_tokens, (1.0 / 2.0, 1.0 / 2.0)
+        )  # BELU-2
     elif gram == 3:
-        bleu = sentence_bleu([reference_tokens], hypothesis_tokens, (1. / 3., 1. / 3., 1. / 3.))  # BELU-3
+        bleu = sentence_bleu(
+            [reference_tokens], hypothesis_tokens, (1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0)
+        )  # BELU-3
     elif gram == 4:
-        bleu = sentence_bleu([reference_tokens], hypothesis_tokens, (1. / 4., 1. / 4., 1. / 4., 1. / 4.))  # BELU-4
+        bleu = sentence_bleu(
+            [reference_tokens],
+            hypothesis_tokens,
+            (1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0),
+        )  # BELU-4
 
     return bleu
 
@@ -54,7 +63,7 @@ def caculate_bleu(results, data, gram):
 def score_rouge(str1, str2):
     rouge = Rouge(metrics=["rouge-l"])
     scores = rouge.get_scores(str1, str2, avg=True)
-    rouge_l = scores['rouge-l']['f']
+    rouge_l = scores["rouge-l"]["f"]
     return rouge_l
 
 

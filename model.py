@@ -1,9 +1,13 @@
-'''
+"""
 Adapted from https://github.com/huggingface/transformers
-'''
+"""
 
 from transformers import T5Config, T5ForConditionalGeneration
-from transformers.models.t5.modeling_t5 import T5Stack, __HEAD_MASK_WARNING_MSG, T5EncoderModel
+from transformers.models.t5.modeling_t5 import (
+    T5Stack,
+    __HEAD_MASK_WARNING_MSG,
+    T5EncoderModel,
+)
 import copy
 import math
 import os
@@ -16,6 +20,7 @@ from transformers.modeling_outputs import (
     BaseModelOutput,
     Seq2SeqLMOutput,
 )
+
 
 class T5ForMultimodalGeneration(T5ForConditionalGeneration):
     _keys_to_ignore_on_load_missing = [
@@ -30,16 +35,22 @@ class T5ForMultimodalGeneration(T5ForConditionalGeneration):
     def __init__(self, config: T5Config, patch_size, padding_idx, save_dir):
         super().__init__(config)
         self.model_dim = config.d_model
-        
+
         self.padding_idx = padding_idx
-        self.out = open(os.path.join(save_dir, 'gate.txt'), 'w')
+        self.out = open(os.path.join(save_dir, "gate.txt"), "w")
 
         self.shared = nn.Embedding(config.vocab_size, config.d_model)
         self.patch_num, self.patch_dim = patch_size
 
         self.image_dense = nn.Linear(self.patch_dim, config.d_model)
-        self.mha_layer = torch.nn.MultiheadAttention(embed_dim=config.hidden_size, kdim=config.hidden_size, vdim=config.hidden_size, num_heads=1, batch_first=True)
-        self.gate_dense = nn.Linear(2*config.hidden_size, config.hidden_size)
+        self.mha_layer = torch.nn.MultiheadAttention(
+            embed_dim=config.hidden_size,
+            kdim=config.hidden_size,
+            vdim=config.hidden_size,
+            num_heads=1,
+            batch_first=True,
+        )
+        self.gate_dense = nn.Linear(2 * config.hidden_size, config.hidden_size)
         self.sigmoid = nn.Sigmoid()
 
         encoder_config = copy.deepcopy(config)
@@ -84,7 +95,9 @@ class T5ForMultimodalGeneration(T5ForConditionalGeneration):
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple[torch.FloatTensor], Seq2SeqLMOutput]:
         use_cache = use_cache if use_cache is not None else self.config.use_cache
-        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+        return_dict = (
+            return_dict if return_dict is not None else self.config.use_return_dict
+        )
 
         # FutureWarning: head_mask was separated into two input args - head_mask, decoder_head_mask
         if head_mask is not None and decoder_head_mask is None:
@@ -112,9 +125,8 @@ class T5ForMultimodalGeneration(T5ForConditionalGeneration):
                 attentions=encoder_outputs[2] if len(encoder_outputs) > 2 else None,
             )
 
-
         hidden_states = encoder_outputs[0]
-        
+
         image_embedding = self.image_dense(image_ids)
         image_att, _ = self.mha_layer(hidden_states, image_embedding, image_embedding)
 
@@ -125,7 +137,11 @@ class T5ForMultimodalGeneration(T5ForConditionalGeneration):
         if self.model_parallel:
             torch.cuda.set_device(self.decoder.first_device)
 
-        if labels is not None and decoder_input_ids is None and decoder_inputs_embeds is None:
+        if (
+            labels is not None
+            and decoder_input_ids is None
+            and decoder_inputs_embeds is None
+        ):
             # get decoder inputs from shifting lm labels to the right
             decoder_input_ids = self._shift_right(labels)
 
@@ -138,7 +154,9 @@ class T5ForMultimodalGeneration(T5ForConditionalGeneration):
             if attention_mask is not None:
                 attention_mask = attention_mask.to(self.decoder.first_device)
             if decoder_attention_mask is not None:
-                decoder_attention_mask = decoder_attention_mask.to(self.decoder.first_device)
+                decoder_attention_mask = decoder_attention_mask.to(
+                    self.decoder.first_device
+                )
 
         # Decode
         decoder_outputs = self.decoder(
