@@ -1,34 +1,26 @@
+import argparse
+import json
 import os
+import random
+import re
+
 import numpy as np
 import torch
-import os
-import re
-import json
-import argparse
-import random
-from transformers import (
-    T5Tokenizer,
-    DataCollatorForSeq2Seq,
-    Seq2SeqTrainingArguments,
-    Seq2SeqTrainer,
-    T5ForConditionalGeneration,
-)
-from model import T5ForConditionalGeneration, T5ForMultimodalGeneration
-from utils_data import (
-    img_shape,
-    load_data_std,
-    load_data_img,
-    ScienceQADatasetStd,
-    ScienceQADatasetImg,
-)
-from utils_evaluate import get_scores
-from rich.table import Column, Table
 from rich import box
 from rich.console import Console
+from rich.table import Column, Table
+from transformers import (DataCollatorForSeq2Seq, Seq2SeqTrainer,
+                          Seq2SeqTrainingArguments, T5ForConditionalGeneration,
+                          T5Tokenizer)
+
+from model import T5ForConditionalGeneration, T5ForMultimodalGeneration
+from utils_data import (ScienceQADatasetImg, ScienceQADatasetStd, img_shape,
+                        load_data_img, load_data_std)
+from utils_evaluate import get_scores
 
 console = Console(record=True)
-import nltk
 import evaluate
+import nltk
 
 
 def parse_args():

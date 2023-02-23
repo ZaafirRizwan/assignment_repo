@@ -3,8 +3,9 @@ Adapted from https://github.com/lupantech/ScienceQA
 """
 
 import re
-from rouge import Rouge
+
 from nltk.translate.bleu_score import sentence_bleu
+from rouge import Rouge
 from sentence_transformers import util
 
 
