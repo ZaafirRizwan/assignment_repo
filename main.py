@@ -5,55 +5,27 @@ import random
 import re
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import numpy as np
 import torch
 from rich import box
 from rich.console import Console
 from rich.table import Column, Table
-from transformers import (DataCollatorForSeq2Seq, Seq2SeqTrainer,
-                          Seq2SeqTrainingArguments, T5ForConditionalGeneration,
-                          T5Tokenizer)
+from transformers import (
+    DataCollatorForSeq2Seq,
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
+    T5ForConditionalGeneration,
+    T5Tokenizer,
+)
 
 from model import T5ForConditionalGeneration, T5ForMultimodalGeneration
-from utils_data import (ScienceQADatasetImg, ScienceQADatasetStd, img_shape,
-                        load_data_img, load_data_std)
+from utils_data import (
+    ScienceQADatasetImg,
+    ScienceQADatasetStd,
+    img_shape,
+    load_data_img,
+    load_data_std,
+)
 from utils_evaluate import get_scores
 
 console = Console(record=True)
